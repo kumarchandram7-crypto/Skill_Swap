@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillSwap Campus | Skill → Rank → Real Task</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ========================================================================
+       App Navigation Header
+       ======================================================================== -->
+  <header class="app-header">
+    <div class="header-container">
+      <!-- Brand Logo -->
+      <div class="logo-group" onclick="window.switchTab('dashboard')">
+        <div class="logo-badge">⚡</div>
+        <div>
+          <span class="logo-text">SkillSwap<span class="logo-subtext">CAMPUS</span></span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-target="dashboard">
+          <span>🏠</span> Overview
+        </button>
+        <button class="nav-tab-btn" data-target="tasks">
+          <span>💼</span> Real-project
+        </button>
+        <button class="nav-tab-btn" data-target="assessments">
+          <span>✍️</span> Skill Quiz
+        </button>
+        <button class="nav-tab-btn" data-target="swaps">
+          <span>🤝</span> hackathon-team
+        </button>
+        <button class="nav-tab-btn" data-target="leaderboard">
+          <span>🏆</span> Leaderboard
+        </button>
+        <button class="nav-tab-btn" data-target="profile">
+          <span>👤</span> My Profile
+        </button>
+      </nav>
+
+      <!-- Role Selector & Current User -->
+      <div class="header-actions">
+        <!-- Quick Demo Switcher -->
+        <div class="role-pill-selector" title="Switch user role for Hackathon Demo">
+          <button class="role-pill-btn active" data-role="student">Student</button>
+          <button class="role-pill-btn" data-role="provider">Client</button>
+          <button class="role-pill-btn" data-role="admin">Admin</button>
+        </div>
+
+        <!-- Auth Button (Shown when logged out) -->
+        <button class="btn btn-primary btn-sm" id="btn-header-login" style="display: none;" onclick="window.openAuthModal('login')">
+          Log In / Sign Up
+        </button>
+
+        <!-- User Profile Pill & Dropdown -->
+        <div class="user-menu-wrapper" id="header-user-wrapper">
+          <div class="user-profile-preview" id="user-menu-trigger" onclick="window.toggleUserMenu()">
+            <div class="user-avatar" id="header-avatar">R</div>
+            <div class="user-details">
+              <span class="user-name" id="header-user-name">Rahul Sharma</span>
+              <span class="user-role-tag" id="header-user-role">3rd Yr CSE • 1450 XP</span>
+            </div>
+            <span style="font-size: 0.7rem; color: var(--gray-400); margin-left: 0.25rem;">▼</span>
+          </div>
+
+          <!-- Dropdown Menu -->
+          <div class="user-menu-dropdown" id="user-menu-dropdown">
+            <div style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-color); margin-bottom: 0.35rem;">
+              <div style="font-weight: 800; font-size: 0.9rem; color: var(--gray-900);" id="menu-dropdown-name">Rahul Sharma</div>
+              <div style="font-size: 0.72rem; color: var(--gray-500);" id="menu-dropdown-email">rahul.s@campus.edu</div>
+              <span class="badge badge-student" id="menu-dropdown-badge" style="margin-top: 0.35rem;">STUDENT</span>
+            </div>
+            <button class="dropdown-item" onclick="window.switchTab('profile'); window.closeUserMenu();">
+              <span>👤</span> My Profile
+            </button>
+            <button class="dropdown-item" id="menu-student-action" onclick="window.switchTab('assessments'); window.closeUserMenu();">
+              <span>✍️</span> Take Skill Quiz
+            </button>
+            <button class="dropdown-item" id="menu-provider-action" style="display: none;" onclick="window.openModal('modal-post-task'); window.closeUserMenu();">
+              <span>💼</span> + Post Campus Task
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" onclick="window.openAuthModal('login'); window.closeUserMenu();">
+              <span>🔄</span> Switch Account / Sign Up
+            </button>
+            <button class="dropdown-item danger" onclick="window.handleLogout(); window.closeUserMenu();">
+              <span>🚪</span> Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       Role Demo Banner
+       ======================================================================== -->
+  <div class="role-banner">
+    <div class="role-banner-content">
+      <div id="role-banner-desc">
+        <span class="role-banner-badge">STUDENT MODE</span>
+        Viewing as <strong>Rahul Sharma</strong>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="banner-action-btn" id="role-banner-action" onclick="window.switchTab('assessments')">
+          Take Skill Quiz ⚡
+        </button>
+        <button class="banner-action-btn" onclick="window.resetToSeedData()" title="Reset mock data to fresh hackathon state">
+          🔄 Reset Demo Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Main Content Container
+       ======================================================================== -->
+  <main class="main-content">
+
+    <!-- ======================================================================
+         VIEW: Dashboard
+         ====================================================================== -->
+    <section class="view-section active" id="view-dashboard">
+      <!-- USP Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-content">
+          <div class="hero-pill">🔥 Hackathon USP: The Campus Growth Engine</div>
+          <h1 class="hero-title">Skill → Rank → Real Task</h1>
+          <p class="hero-subtitle">
+            Don't just say you know a skill. Prove your ability with campus verification quizzes, get matched with real departmental micro-gigs, and build a verified reputation score.
+          </p>
+
+          <!-- Core Flow Visualizer -->
+          <div class="loop-visual">
+            <span class="loop-step">📚 Learn Skills</span>
+            <span class="loop-arrow">➔</span>
+            <span class="loop-step">✍️ Verify Quiz</span>
+            <span class="loop-arrow">➔</span>
+            <span class="loop-step">🏅 Get Rank</span>
+            <span class="loop-arrow">➔</span>
+            <span class="loop-step">💼 Matched Micro-Gig</span>
+            <span class="loop-arrow">➔</span>
+            <span class="loop-step">⭐ Earn ₹ & Trust</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="stats-grid" id="dashboard-stats">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+
+      <!-- Split Layout: Recommended Gigs & Verified Skills -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; align-items: start;">
+        <!-- Left: Recommended Tasks -->
+        <div>
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <h2>⚡ Recommended Micro-Gigs for You</h2>
+              <p>Rank-matched tasks based on your verified campus assessments.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="window.switchTab('tasks')">
+              View All Campus Tasks ➔
+            </button>
+          </div>
+          <div class="tasks-grid" id="dashboard-recommended-tasks" style="grid-template-columns: 1fr;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Right: Verified Skill Card -->
+        <div>
+          <div class="section-header">
+            <div class="section-title-wrap">
+              <h2>🛡️ Verified Skills</h2>
+              <p>Your validated proficiency meters.</p>
+            </div>
+          </div>
+          <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem; box-shadow: var(--shadow-sm);">
+            <div id="dashboard-verified-skills">
+              <!-- Dynamically populated -->
+            </div>
+            <button class="btn btn-primary btn-block btn-sm" onclick="window.switchTab('assessments')" style="margin-top: 0.5rem;">
+              Verify New Skill ✍️
+            </button>
+          </div>
+
+          <!-- Peer Exchange Prompt -->
+          <div style="background: linear-gradient(135deg, #eef2ff, #faf5ff); border: 1px solid #c7d2fe; border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1.5rem;">
+            <h4 style="font-weight: 800; color: var(--primary); margin-bottom: 0.35rem;">🤝 Peer Skill Exchange</h4>
+            <p style="font-size: 0.82rem; color: var(--gray-700); margin-bottom: 0.85rem;">
+              Exchange 1-on-1 sessions. Teach Python in exchange for Figma UI or Video Editing from fellow students.
+            </p>
+            <button class="btn btn-secondary btn-sm btn-block" onclick="window.switchTab('swaps')">
+              Find Peer Mentors ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW: Campus Micro-Gigs (Tasks)
+         ====================================================================== -->
+    <section class="view-section" id="view-tasks">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>🏫 Campus Micro-Gigs Marketplace</h2>
+          <p>Real-world practical tasks posted by campus departments, professors, and student clubs.</p>
+        </div>
+        <button class="btn btn-primary" onclick="window.openModal('modal-post-task')">
+          + Post Campus Task
+        </button>
+      </div>
+
+      <!-- Search & Filters Toolbar -->
+      <div class="toolbar-container">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="task-search-input" placeholder="Search tasks, departments, or keywords (e.g. Excel, Poster, Python)...">
+        </div>
+
+        <div class="filter-group">
+          <select class="filter-select" id="task-filter-skill">
+            <option value="all">All Skills</option>
+            <option value="Python">Python</option>
+            <option value="Excel">Excel</option>
+            <option value="HTML/CSS">HTML/CSS</option>
+            <option value="Graphic Design">Graphic Design</option>
+            <option value="Video Editing">Video Editing</option>
+          </select>
+
+          <select class="filter-select" id="task-filter-diff">
+            <option value="all">All Difficulties</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tasks Grid -->
+      <div class="tasks-grid" id="tasks-card-container">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW: Skill Verification & Quizzes
+         ====================================================================== -->
+    <section class="view-section" id="view-assessments">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>✍️ Skill Verification & Trust Score Engine</h2>
+          <p>Complete mini-quizzes to verify your skills, earn rank badges, and qualify for high-tier campus gigs.</p>
+        </div>
+      </div>
+
+      <!-- Verification Explanation Banner -->
+      <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div style="max-width: 800px;">
+          <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--gray-900);">Why Skill Verification?</h4>
+          <p style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.25rem;">
+            Anyone can claim they know Python. SkillSwap calculates an objective <strong>Skill Score (0-100)</strong> and ranks you (Novice → Intermediate → Advanced → Master) so campus clubs and professors trust you with real paid work.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <span class="badge badge-beginner">Novice (0-49)</span>
+          <span class="badge badge-intermediate">Intermediate (50-74)</span>
+          <span class="badge badge-advanced">Advanced (75-89)</span>
+          <span class="badge badge-verified">Master (90-100)</span>
+        </div>
+      </div>
+
+      <!-- Quizzes Grid -->
+      <div class="quiz-grid" id="assessments-grid">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW: Peer SkillSwap Directory
+         ====================================================================== -->
+    <section class="view-section" id="view-swaps">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>🤝 Peer Skill Exchange Directory</h2>
+          <p>Find fellow campus students to swap knowledge 1-on-1: teach what you know, learn what you need.</p>
+        </div>
+        <button class="btn btn-outline" onclick="window.showToast('Listing updated to active campus peers', 'info')">
+          Filter by My Hostel / Branch
+        </button>
+      </div>
+
+      <div class="peer-grid" id="peer-cards-container">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW: Campus Leaderboard
+         ====================================================================== -->
+    <section class="view-section" id="view-leaderboard">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>🏆 Campus Talent Leaderboard</h2>
+          <p>Top students ranked by earned Experience Points (XP), verified assessments, and peer reviews.</p>
+        </div>
+      </div>
+
+      <div class="leaderboard-table-wrap">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Student</th>
+              <th>Top Verified Skill</th>
+              <th>Gigs Done</th>
+              <th>Peer Rating</th>
+              <th>Trust Score</th>
+              <th>Total XP</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-table-body">
+            <!-- Rendered by app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         VIEW: User Profile & Reputation Hub
+         ====================================================================== -->
+    <section class="view-section" id="view-profile">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2>👤 Campus Profile & Reputation</h2>
+          <p>Your verified credentials, completed gigs, and peer endorsements.</p>
+        </div>
+      </div>
+
+      <div id="profile-view-content">
+        <!-- Rendered by app.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================
+       MODALS
+       ======================================================================== -->
+
+  <!-- 1. Post Task Modal -->
+  <div class="modal-backdrop" id="modal-post-task">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3>Post a Campus Micro-Gig</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-post-task')">&times;</button>
+      </div>
+      <form id="form-post-task">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Task Title *</label>
+            <input type="text" class="form-input" name="task_title" placeholder="e.g. Clean & Format 1,200 Student Exam Attendance Records" required>
+            <div class="form-hint">Be clear about what you need done.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Detailed Description *</label>
+            <textarea class="form-textarea" name="task_desc" rows="3" placeholder="Explain the deliverable, tools to use, and expectations..." required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Required Primary Skill *</label>
+              <select class="form-select" name="task_skill" required>
+                <option value="Python">Python</option>
+                <option value="Excel">Excel</option>
+                <option value="HTML/CSS">HTML/CSS</option>
+                <option value="Graphic Design">Graphic Design</option>
+                <option value="Video Editing">Video Editing</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Minimum Verified Rank *</label>
+              <select class="form-select" name="task_min_rank" required>
+                <option value="Beginner">Beginner (Open to all)</option>
+                <option value="Intermediate" selected>Intermediate (Verified 50+)</option>
+                <option value="Advanced">Advanced (Verified 75+)</option>
+                <option value="Master">Master (Verified 90+)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Difficulty Level</label>
+              <select class="form-select" name="task_difficulty">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate" selected>Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Estimated Time Required *</label>
+              <input type="text" class="form-input" name="task_time" placeholder="e.g. 2 hours" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Reward Amount (₹) *</label>
+              <input type="number" class="form-input" name="task_reward" value="300" min="50" step="50" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Campus Department / Host Club</label>
+              <input type="text" class="form-input" name="task_dept" placeholder="e.g. Academic Exam Cell, Tech Fest Committee">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-post-task')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Publish Campus Task 🚀</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Apply Modal -->
+  <div class="modal-backdrop" id="modal-apply">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Apply for Campus Task</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-apply')">&times;</button>
+      </div>
+      <div class="modal-body" id="apply-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Manage Task & Applicants Modal -->
+  <div class="modal-backdrop" id="modal-manage-task">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3>Review Applicants & Manage Task</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-manage-task')">&times;</button>
+      </div>
+      <div class="modal-body" id="manage-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Interactive Quiz Modal -->
+  <div class="modal-backdrop" id="modal-quiz">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="quiz-modal-title">Skill Verification Assessment</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-quiz')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="quiz-step-progress">
+          <span id="quiz-step-text">Question 1 of 4</span>
+          <span style="color: var(--primary);">⚡ Timed Verification</span>
+        </div>
+
+        <div class="quiz-question-box">
+          <h4 class="quiz-q-title" id="quiz-question-text">Question loading...</h4>
+          <pre class="quiz-code-snippet" id="quiz-code-container" style="display: none;"></pre>
+        </div>
+
+        <div class="quiz-options" id="quiz-options-container">
+          <!-- Options rendered dynamically -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="window.closeModal('modal-quiz')">Exit</button>
+        <button type="button" class="btn btn-primary" id="quiz-next-btn" onclick="window.nextQuizQuestion()">Next Question ➔</button>
+        <button type="button" class="btn btn-success" id="quiz-finish-btn" style="display: none;" onclick="window.submitQuiz()">Submit & Calculate Rank ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Quiz Result Modal -->
+  <div class="modal-backdrop" id="modal-quiz-result">
+    <div class="modal-box">
+      <div class="modal-body" id="quiz-result-body">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Rate & Complete Task Modal -->
+  <div class="modal-backdrop" id="modal-rate">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Finalize Task & Rate</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-rate')">&times;</button>
+      </div>
+      <div class="modal-body" id="rating-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Peer Swap Modal -->
+  <div class="modal-backdrop" id="modal-swap">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Propose Peer Skill Swap</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-swap')">&times;</button>
+      </div>
+      <div class="modal-body" id="swap-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Generic Details Modal -->
+  <div class="modal-backdrop" id="modal-generic">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="generic-modal-title">Task Details</h3>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-generic')">&times;</button>
+      </div>
+      <div class="modal-body" id="generic-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Authentication Modal (Login & Registration) -->
+  <div class="modal-backdrop" id="modal-auth">
+    <div class="modal-box modal-lg">
+      <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+        <div>
+          <h3 style="font-size: 1.3rem; font-weight: 800;">Welcome to SkillSwap Campus</h3>
+          <p style="font-size: 0.8rem; color: var(--gray-500); margin-top: 0.15rem;">Connect student talent with verified campus micro-gigs.</p>
+        </div>
+        <button class="modal-close-btn" onclick="window.closeModal('modal-auth')">&times;</button>
+      </div>
+
+      <!-- Auth Tabs -->
+      <div class="auth-tabs" style="margin-top: 1rem;">
+        <button class="auth-tab-btn active" id="tab-btn-login" onclick="window.switchAuthTab('login')">
+          <span>🔑</span> Log In
+        </button>
+        <button class="auth-tab-btn" id="tab-btn-student" onclick="window.switchAuthTab('student')">
+          <span>🎓</span> Sign Up as Student
+        </button>
+        <button class="auth-tab-btn" id="tab-btn-client" onclick="window.switchAuthTab('client')">
+          <span>🏛️</span> Sign Up as Client / Provider
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- PANE 1: Log In -->
+        <div class="auth-pane active" id="pane-auth-login">
+          <form id="form-login" onsubmit="window.handleLoginSubmit(event)">
+            <div class="form-group">
+              <label class="form-label">Campus Email</label>
+              <input type="email" class="form-input" name="login_email" placeholder="e.g. rahul.s@campus.edu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-input" name="login_password" placeholder="Enter your password (default: password123)" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 0.5rem;">
+              Log In to SkillSwap ➔
+            </button>
+          </form>
+
+          <!-- 1-Click Quick Demo Login Section -->
+          <div class="quick-login-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em;">
+                ⚡ 1-Click Quick Demo Accounts
+              </span>
+              <span style="font-size: 0.72rem; color: var(--primary);">Instant Hackathon Access</span>
+            </div>
+
+            <div class="quick-login-grid">
+              <div class="quick-login-card" onclick="window.quickLogin('student-1')">
+                <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.8rem; background: linear-gradient(135deg, #4f46e5, #7c3aed);">R</div>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Rahul Sharma</div>
+                  <div style="font-size: 0.7rem; color: var(--gray-500);">Student • Python Dev</div>
+                </div>
+              </div>
+
+              <div class="quick-login-card" onclick="window.quickLogin('student-2')">
+                <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.8rem; background: linear-gradient(135deg, #ec4899, #f43f5e);">A</div>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Ananya Patel</div>
+                  <div style="font-size: 0.7rem; color: var(--gray-500);">Student • Design Master</div>
+                </div>
+              </div>
+
+              <div class="quick-login-card" onclick="window.quickLogin('provider-1')">
+                <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.8rem; background: linear-gradient(135deg, #1e293b, #475569);">S</div>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Prof. S. Sen</div>
+                  <div style="font-size: 0.7rem; color: #047857; font-weight: 600;">Client • Exam Cell</div>
+                </div>
+              </div>
+
+              <div class="quick-login-card" onclick="window.quickLogin('provider-2')">
+                <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.8rem; background: linear-gradient(135deg, #059669, #10b981);">R</div>
+                <div>
+                  <div style="font-size: 0.82rem; font-weight: 700;">Robotics Club</div>
+                  <div style="font-size: 0.7rem; color: #047857; font-weight: 600;">Client • Tech Club</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: Sign Up as Student -->
+        <div class="auth-pane" id="pane-auth-student">
+          <form id="form-signup-student" onsubmit="window.handleStudentSignUpSubmit(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-input" name="student_name" placeholder="e.g. Aditi Rao" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Campus Email *</label>
+                <input type="email" class="form-input" name="student_email" placeholder="e.g. aditi.r@campus.edu" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Create Password *</label>
+                <input type="password" class="form-input" name="student_password" placeholder="Min 6 characters" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Academic Year *</label>
+                <select class="form-select" name="student_year" required>
+                  <option value="1st Year">1st Year (Freshman)</option>
+                  <option value="2nd Year" selected>2nd Year (Sophomore)</option>
+                  <option value="3rd Year">3rd Year (Junior)</option>
+                  <option value="4th Year">4th Year (Senior)</option>
+                  <option value="Postgraduate">Postgraduate / Masters</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Department / Branch *</label>
+                <select class="form-select" name="student_dept" required>
+                  <option value="Computer Science & Eng.">Computer Science & Eng.</option>
+                  <option value="Information Technology">Information Technology</option>
+                  <option value="Electronics & Comm.">Electronics & Comm.</option>
+                  <option value="Mechanical Engineering">Mechanical Engineering</option>
+                  <option value="Civil Engineering">Civil Engineering</option>
+                  <option value="Management / MBA">Management / MBA</option>
+                  <option value="Design & Media Arts">Design & Media Arts</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Primary Skill to Verify *</label>
+                <select class="form-select" name="student_skill" required>
+                  <option value="Python">Python</option>
+                  <option value="Excel">Excel</option>
+                  <option value="HTML/CSS">HTML/CSS</option>
+                  <option value="Graphic Design">Graphic Design</option>
+                  <option value="Video Editing">Video Editing</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Skills You Want to Learn (Peer Exchange)</label>
+              <input type="text" class="form-input" name="student_wants_to_learn" placeholder="e.g. Figma UI Design, React, Excel Dashboards">
+              <div class="form-hint">These will appear on your Peer SkillSwap profile.</div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 0.5rem;">
+              Create Student Account 🎓
+            </button>
+          </form>
+        </div>
+
+        <!-- PANE 3: Sign Up as Client / Task Provider -->
+        <div class="auth-pane" id="pane-auth-client">
+          <form id="form-signup-client" onsubmit="window.handleClientSignUpSubmit(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Organization / Department Name *</label>
+                <input type="text" class="form-input" name="client_org_name" placeholder="e.g. AI Research Lab, Coding Society, Dean's Office" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact Person / Lead *</label>
+                <input type="text" class="form-input" name="client_contact_name" placeholder="e.g. Dr. Priya Verma, Rohit Mehta" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Campus / Official Email *</label>
+                <input type="email" class="form-input" name="client_email" placeholder="e.g. ailab@campus.edu, codingclub@campus.edu" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Create Password *</label>
+                <input type="password" class="form-input" name="client_password" placeholder="Min 6 characters" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Organization Category *</label>
+              <select class="form-select" name="client_org_type" required>
+                <option value="Student Club / Tech Society">Student Club / Tech Society</option>
+                <option value="Faculty / Academic Department">Faculty / Academic Department</option>
+                <option value="Campus Administration / Cell">Campus Administration / Cell</option>
+                <option value="College Fest Committee">College Fest Committee</option>
+                <option value="Campus Hostel Board">Campus Hostel Board</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block btn-lg" style="margin-top: 0.5rem;">
+              Register as Client / Task Provider 🏛️
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Alerts Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- App Scripts -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
